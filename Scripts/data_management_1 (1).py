@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-
+import pyarrow as pa
+import pyarrow.parquet as pq
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,6 +14,8 @@ import statsmodels.api as sm
 from statsmodels.graphics.tsaplots import plot_pacf
 from statsmodels.graphics.tsaplots import plot_acf
 from statsmodels.tsa.stattools import adfuller
+
+
 
 train_df = pd.read_csv('/kaggle/input/store-sales-time-series-forecasting/train.csv')
 test_df = pd.read_csv('/kaggle/input/store-sales-time-series-forecasting/test.csv')
@@ -44,3 +47,7 @@ transaction_df['year'] = transaction_df['date'].dt.year
 transaction_df['month'] = transaction_df['date'].dt.month
 
 train_df.to_csv('traindf_processed.csv')
+
+table = pa.Table.from_pandas(train_df)
+
+pq.write_table(table, 'train.parquet', compression='GZIP')
