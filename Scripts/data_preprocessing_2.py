@@ -1,4 +1,6 @@
 
+import pyarrow as pa
+import pyarrow.parquet as pq
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -55,3 +57,7 @@ test_df.duplicated().any()
 train_df['dcoilwtico_filled'] = train_df['dcoilwtico'].fillna(method='bfill')
 
 train_df.to_csv('traindf_preprocessed.csv')
+
+table = pa.Table.from_pandas(train_df)
+
+pq.write_table(table, 'train.parquet', compression='GZIP')
