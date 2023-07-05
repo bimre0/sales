@@ -4,6 +4,28 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.preprocessing import OneHotEncoder
 import yaml
 import pickle
+import argparse
+import logging
+
+# Configure the logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+parser = argparse.ArgumentParser(description='Sales Forecasting')
+# Add arguments
+parser.add_argument('--alpha', type=float, default=0.5, help='Alpha value for the forecast (default: 0.5)')
+parser.add_argument('--beta', type=float, default=0.3, help='Beta value for the forecast (default: 0.3)')
+parser.add_argument('--gamma', type=float, default=0.2, help='Gamma value for the forecast (default: 0.2)')
+parser.add_argument('--split_val', type=float, default=0.8, help='Split value for training and testing (default: 0.9)')
+
+# Parse the arguments
+args = parser.parse_args()
+
+# Access the values of the arguments
+alpha = args.alpha
+beta = args.beta
+gamma = args.gamma
+split_val = args.split_val
 
 
 # Read the train.parquet file
@@ -25,14 +47,15 @@ family_encoded_df = pd.DataFrame(family_encoded, columns=encoder.get_feature_nam
 df = pd.concat([df, family_encoded_df], axis=1)
 
 # Load hyperparameters from params.yaml
-with open('params.yaml', 'r') as f:
-    params = yaml.safe_load(f)
+# with open('params.yaml', 'r') as f:
+#     params = yaml.safe_load(f)
 
 # Extract hyperparameters
-alpha = params['alpha']
-beta = params['beta']
-gamma = params['gamma']
-split_val = params['split_val']
+# alpha = params['alpha']
+# beta = params['beta']
+# gamma = params['gamma']
+# split_val = params['split_val']
+
 # Perform forecasting using Linear Regression model
 model = LinearRegression()
 X = df[['store_nbr', 'onpromotion', 'month', 'year', 'day_of_week'] + list(encoder.get_feature_names_out(['family']))]
@@ -60,12 +83,12 @@ test_rmse = mean_squared_error(y_test, forecast_test, squared=False)
 test_r2 = r2_score(y_test, forecast_test)
 
 # Print benchmarking metrics
-print("Train set MAE:", train_mae)
-print("Train set RMSE:", train_rmse)
-print("Train set R^2:", train_r2)
-print("Test set MAE:", test_mae)
-print("Test set RMSE:", test_rmse)
-print("Test set R^2:", test_r2)
+logging.debug("Train set MAE:", train_mae)
+logging.debug("Train set RMSE:", train_rmse)
+logging.debug("Train set R^2:", train_r2)
+logging.debug("Test set MAE:", test_mae)
+logging.debug("Test set RMSE:", test_rmse)
+logging.debug("Test set R^2:", test_r2)
 
 # Save evaluation results to a file
 with open('evaluation_results.txt', 'w') as file:
