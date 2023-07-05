@@ -1,0 +1,8 @@
+theme: jekyll-theme-cayman
+
+defaults:
+  - scope:
+      path: "README.md"
+      type: "pages"
+    values:
+      description: "Example Sales Forecasting Project"
