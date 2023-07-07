@@ -1,7 +1,6 @@
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.preprocessing import OneHotEncoder
 import yaml
 import pickle
 import argparse
@@ -27,7 +26,6 @@ beta = args.beta
 gamma = args.gamma
 split_val = args.split_val
 
-
 # Read the train.parquet file
 df = pd.read_parquet('train.parquet')
 
@@ -37,28 +35,9 @@ df['month'] = df['date'].dt.month
 df['year'] = df['date'].dt.year
 df['day_of_week'] = df['date'].dt.dayofweek
 
-# Fix family column as categorical feature
-df['family'] = df['family'].astype('category')
-
-# Perform one-hot encoding on the family column
-encoder = OneHotEncoder(sparse=False)
-family_encoded = encoder.fit_transform(df[['family']])
-family_encoded_df = pd.DataFrame(family_encoded, columns=encoder.get_feature_names_out(['family']))
-df = pd.concat([df, family_encoded_df], axis=1)
-
-# Load hyperparameters from params.yaml
-# with open('params.yaml', 'r') as f:
-#     params = yaml.safe_load(f)
-
-# Extract hyperparameters
-# alpha = params['alpha']
-# beta = params['beta']
-# gamma = params['gamma']
-# split_val = params['split_val']
-
 # Perform forecasting using Linear Regression model
 model = LinearRegression()
-X = df[['store_nbr', 'onpromotion', 'month', 'year', 'day_of_week'] + list(encoder.get_feature_names_out(['family']))]
+X = df[['store_nbr', 'onpromotion', 'month', 'year', 'day_of_week']
 y = df['sales']
 split_index = int(len(df) * split_val)  # Use the last 10% of data as the test set
 
